@@ -6,6 +6,7 @@ session in Zoom. Yes, this is highly biased towards my workflow, but at 50 lines
 of Bash, it would be very easy to extend the wrapper to support other tools.
 
 This is a true wrapper: Any `tmate` command will work through `tmate-wrapper`.
+
 Think of `tm` as your new `tmate`.
 
 ### Start a new tmate session
@@ -34,6 +35,7 @@ tm address
 ## Installing
 
 `git clone https://github.com/bobbyno/tmate-wrapper.git`
+
 `make install`
 
 This will create a symlink to `/usr/local/bin/tm`.
