@@ -1,38 +1,53 @@
-# tmate-wrapper: tm
+# tm: tmate-wrapper
 
-Provides some extra features for `tmate`, most notably a convenient way to
-invite people to join your `tmate` session on Slack with a link to your video
-session in Zoom. Yes, this is highly biased towards my workflow, but at 50 lines
-of Bash, it would be very easy to extend the wrapper to support other tools.
+`tm` is a small wrapper script that enhances [tmate's](https://tmate.io) usability and makes it easy to integrate with other tools.
 
-This is a true wrapper: Any `tmate` command will work through `tmate-wrapper`.
-
-Think of `tm` as your new `tmate`.
+Use `tm` anywhere you would have used `tmate`.
 
 ### Start a new tmate session
 
 `tm`
 
+This starts `tmate` as a daemon as described on the [tmate.io website](https://tmate.io) and attaches a session.
+
+### Show your tmate addresses
+
+```
+# read-write address
+tm address
+=> ssh qRBbcBAQJcU5NazhagxewPVHh@ny.tmate.io
+
+# read-only address
+tm address-ro
+=> ssh ro-C4b1hemhlJDqQxCnt07SdvyUq@ny2.tmate.io
+
+# html address
+tm address-html
+=> https://tmate.io/t/sww8BF5FrYnJi4iuw1d4qPsQl
+
+# read-only html address
+tm address-html
+=> https://tmate.io/t/ro-C4b1hemhlJDqQxCnt07SdvyUq
+
+```
+
+If you're on OS X, add `| pbcopy` to the above to easily copy your links.
+
 ### Send an invitation to @someone in a #channel on Slack
 
 `tm slack channel someone`
 
-### Show your tmate ssh address
-
-```
-tm address
-=> ssh qRBbcBAQJcU5NazhagxewPVHh@ny.tmate.io
-```
-
 ### Show tmate's version
 
-`tm -v`
+`tm version` or `tm -V`
 
 ### Get help for tmate / tmux and the tmate-wrapper
 
-`tm -h`
+`tm help` or `tm -h`
 
-## Installing
+Any of these `tmate` commands will work through `tm`.
+
+## Installation
 
 `git clone https://github.com/bobbyno/tmate-wrapper.git`
 
@@ -40,16 +55,10 @@ tm address
 
 This will create a symlink to `/usr/local/bin/tm`.
 
-Create two environment variables in your `.bashrc` or equivalent:
+### Slack Integration (optional)
 
-* _Zoom Personal Meeting ID (PMI)_
-
-In the Meetings tab in the zoom app, check "Always use PMI for instant meetings on this computer".
-Use your PMI without dashes in your default zoom url:
-
-`export DEFAULT_ZOOM=https://zoom.us/j/655321`
-
-* _Slack Incoming Webhook_
+To enable the `slack` command, add a _Slack Incoming Webhook_
+address as an environment variable in your `.bashrc` or equivalent:
 
 ```
 export SLACK_WEBHOOK=https://hooks.slack.com/services/xyz/123

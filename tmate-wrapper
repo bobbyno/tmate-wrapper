@@ -4,12 +4,6 @@ set -e
 
 sock=/tmp/tmate.sock
 
-# Usage: slack channel user_to_post_as "message" webhook
-slack() {
-    curl -sS -o /dev/null -X POST --data-urlencode \
-         "payload={\"channel\": \"#$1\", \"username\": \"$2\", \"icon_emoji\": \":$2:\", \"text\": \"$3\"}" $4
-}
-
 new_session() {
     tmate -S $sock new-session -d     # Launch tmate in a detached state
     tmate -S $sock wait tmate-ready   # Blocks until the SSH connection is established
@@ -23,14 +17,26 @@ tmate_address() {
     tmate -S $sock display -p '#{tmate_ssh}' 2>&1
 }
 
-help() {
-    tmate list-commands
-    printf "\ntmate-wrapper enhancements:\n"
-    printf "\tattach\n"
-    printf "\taddress\n"
-    printf "\thelp\n"
-    printf "\tslack channel user\n"
-    printf "\tversion\n"
+tmate_address_ro() {
+    tmate -S $sock display -p '#{tmate_ssh_ro}' 2>&1
+}
+
+tmate_address_html() {
+    local addr=$(echo $(tmate_address))
+    local link=$(echo $addr | cut -d ' ' -f 2 | cut -d '@' -f 1)
+    echo https://tmate.io/t/$link
+}
+
+tmate_address_html_ro() {
+    local addr=$(echo $(tmate_address_ro))
+    local link=$(echo $addr | cut -d ' ' -f 2 | cut -d '@' -f 1)
+    echo https://tmate.io/t/$link
+}
+
+# Usage: slack channel user_to_post_as "message" webhook
+slack() {
+    curl -sS -o /dev/null -X POST --data-urlencode \
+         "payload={\"channel\": \"#$1\", \"username\": \"$2\", \"icon_emoji\": \":$2:\", \"text\": \"$3\"}" $4
 }
 
 # Usage: invite channel user
@@ -43,7 +49,20 @@ invite() {
         exit 1
     fi
 
-    slack $1 pair "Hey, <@$2>...want to pair? Join $user in this <`echo ${address/ /:\/\/}`|tmate session> and this <$DEFAULT_ZOOM|zoom>." $SLACK_WEBHOOK
+    slack $1 pair "Hey, <@$2>...want to pair? Join $user in this <`echo ${address/ /:\/\/}`|tmate session>." $SLACK_WEBHOOK
+}
+
+help() {
+    tmate list-commands
+    printf "\ntmate-wrapper enhancements:\n"
+    printf "\taddress\n"
+    printf "\taddress-html\n"
+    printf "\taddress-html-ro\n"
+    printf "\taddress-ro\n"
+    printf "\tattach\n"
+    printf "\thelp\n"
+    printf "\tslack channel user\n"
+    printf "\tversion\n"
 }
 
 if [[ $# -eq 0 ]]; then
@@ -55,9 +74,15 @@ elif [[ $1 == "slack" ]]; then
     invite $2 $3
 elif [[ $1 == "address" ]]; then
     echo `tmate_address`
+elif [[ $1 == "address-ro" ]]; then
+    echo `tmate_address_ro`
+elif [[ $1 == "address-html" ]]; then
+    echo `tmate_address_html`
+elif [[ $1 == "address-html-ro" ]]; then
+    echo `tmate_address_html_ro`
 elif [[ $1 == "help" || $1 == "-h" ]]; then
     help
-elif [[ $1 == "version" || $1 == "-v" ]]; then
+elif [[ $1 == "version" ]]; then
     tmate -V
 else
     tmate "$@"
